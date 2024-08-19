@@ -1,0 +1,20 @@
+import sys
+import subprocess
+
+# Ensure required packages are installed
+def install_packages():
+    try:
+        import pip
+    except ImportError:
+        print("Pip not found, installing pip...")
+        subprocess.check_call([sys.executable, '-m', 'ensurepip', '--default-pip'])
+
+    packages = ['selenium', 'pandas', 'openpyxl']
+    for package in packages:
+        try:
+            __import__(package)
+        except ImportError:
+            print(f"Installing {package}...")
+            subprocess.check_call([sys.executable, '-m', 'pip', 'install', package])
+
+install_packages()
