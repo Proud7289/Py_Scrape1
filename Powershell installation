@@ -1,0 +1,57 @@
+# Define function to check if a command exists
+function CommandExists {
+    param (
+        [string]$Command
+    )
+    $exists = Get-Command $Command -ErrorAction SilentlyContinue
+    return $exists -ne $null
+}
+
+# Function to install Python 3
+function Install-Python {
+    Write-Host "Checking for Python installation..."
+    if (-not (CommandExists "python3")) {
+        Write-Host "Python not found, installing Python 3..."
+        Invoke-WebRequest -Uri "https://www.python.org/ftp/python/3.9.7/python-3.9.7-amd64.exe" -OutFile "$env:TEMP\python-installer.exe"
+        Start-Process -FilePath "$env:TEMP\python-installer.exe" -ArgumentList "/quiet InstallAllUsers=1 PrependPath=1" -Wait
+    } else {
+        Write-Host "Python is already installed."
+    }
+}
+
+# Function to install pip and required Python packages
+function Install-Packages {
+    Write-Host "Installing pip and required Python packages..."
+    if (-not (CommandExists "pip")) {
+        Write-Host "Pip not found, installing pip..."
+        Start-Process "python" -ArgumentList "-m ensurepip --default-pip" -Wait
+    }
+
+    $packages = "selenium", "pandas", "openpyxl"
+    foreach ($package in $packages) {
+        try {
+            Start-Process "python" -ArgumentList "-m pip install --upgrade $package" -Wait
+            Write-Host "$package installed successfully."
+        } catch {
+            Write-Host "Failed to install $package."
+            $ErrorOccurred = $true
+        }
+    }
+}
+
+# Function to check installations and report
+function Check-Installations {
+    $ErrorOccurred = $false
+
+    Install-Python
+    Install-Packages
+
+    if ($ErrorOccurred) {
+        Write-Host "Some installations failed. Please check the error messages above."
+    } else {
+        Write-Host "All installations completed successfully!"
+    }
+}
+
+# Run the installation check
+Check-Installations
