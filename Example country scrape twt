@@ -22,7 +22,7 @@ options.binary_location = firefox_binary_path
 driver = webdriver.Firefox(service=service, options=options)
 
 # Navigate to the webpage
-driver.get('https://archive.twitter-trending.com/saudi-arabia/18-08-2024')  # Replace with your target URL
+driver.get('https://archive.twitter-trending.com/United-states/18-08-2024')  # Replace with your target URL
 
 # Wait for 5 seconds
 time.sleep(5)
