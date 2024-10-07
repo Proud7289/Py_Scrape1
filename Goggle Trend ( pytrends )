@@ -1,0 +1,52 @@
+import pandas as pd
+from pytrends.request import TrendReq
+import datetime
+import os
+
+# Initialize pytrends
+pytrends = TrendReq(hl='en-US', tz=360)
+
+# Specify the region
+region = 'united_states'  # Modify this to any region you want, e.g., 'japan', 'egypt', etc.
+
+# Get today's date and calculate the past 30 days
+today = datetime.date.today()
+date_range = pd.date_range(end=today, periods=30).tolist()
+
+# Empty DataFrame to collect data
+all_trends_df = pd.DataFrame()
+
+# Loop through the past 30 days and collect daily trending searches
+for single_date in date_range:
+    # Convert date to string format
+    date_str = single_date.strftime("%Y-%m-%d")
+    
+    try:
+        # Get trending searches for the day
+        daily_trends = pytrends.trending_searches(pn=region)
+
+        # Add a date column to the data
+        daily_trends['date'] = date_str
+
+        # Concatenate to the main DataFrame
+        all_trends_df = pd.concat([all_trends_df, daily_trends], axis=0)
+    
+    except Exception as e:
+        print(f"Failed to retrieve data for {date_str}: {e}")
+        continue
+
+# Reset index and rename the column
+all_trends_df.reset_index(drop=True, inplace=True)
+all_trends_df.columns = ['Search Term', 'Date']  # Renaming the columns for clarity
+
+# Save to Excel
+output_directory = r"C:\Users\user\Downloads"  # Specify the directory you want to save the file to
+output_file = os.path.join(output_directory, 'google_trends_last_30_days.xlsx')
+
+# Ensure the directory exists
+os.makedirs(output_directory, exist_ok=True)
+
+# Save the DataFrame to an Excel file
+all_trends_df.to_excel(output_file, index=False)
+
+print(f"Trends data saved successfully to {output_file}")
