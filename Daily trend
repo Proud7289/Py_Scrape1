@@ -1,0 +1,26 @@
+# Dailoy trends + saving excel 
+
+# libraries
+import pytrends
+from pytrends.request import TrendReq
+import pandas as pd
+from datetime import datetime
+import os
+
+# variable definings
+pytrend = TrendReq(hl='en-IN', tz=300)
+df = pytrend.trending_searches(pn='saudi_arabia')
+output_directory = r"C:\Users\user\Desktop\Daily trend" 
+os.makedirs(output_directory, exist_ok=True)
+df = df.head(10)  
+df.reset_index(inplace=True)  
+df.index += 1  
+df.columns = ["Rank", "Trend"]  
+
+# saving output
+today_date = datetime.now().strftime('%Y-%m-%d')
+output_filename = f"Top10Trends-{today_date}.xlsx"
+output_filepath = os.path.join(output_directory, output_filename)
+df.to_excel(output_filepath, index=False)
+
+print(f"Top 10 trends saved successfully to {output_filepath}")
